@@ -11,7 +11,7 @@
 @synthesize identifier = identifier_;
 @synthesize receipt = receipt_;
 
-- (id) initWithIdentifier:(NSString *)identifier receipt:(NSData *)receipt transactionDate:(NSDate *)transactionDate {
+- (id) initWithIdentifier:(NSString*) identifier receipt:(NSData*) receipt transactionDate:(NSDate*) transactionDate {
     self = [super init];
     if (self) {
         self.identifier = identifier;
@@ -21,7 +21,7 @@
     return self;
 }
 
-+ (LolaySKPaymentTransaction *) transactionWithIdentifier:(NSString*) identifier receipt:(NSData*) receipt transactionDate:(NSDate*) transactionDate {
++ (LolaySKPaymentTransaction*) transactionWithIdentifier:(NSString*) identifier receipt:(NSData*) receipt transactionDate:(NSDate*) transactionDate {
     return [[LolaySKPaymentTransaction alloc] initWithIdentifier:identifier receipt:receipt transactionDate:transactionDate];
 }
 

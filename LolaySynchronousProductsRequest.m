@@ -23,11 +23,11 @@
 enum { HAS_PRODUCTS, NO_PRODUCTS };
 
 + (SKProductsResponse*) productsResponseForProductIdentifiers:(NSSet*) productIdentifiers timeout:(NSTimeInterval) timeout error:(NSError**) error {
-    LolaySynchronousProductsRequest * productsRequest = [[LolaySynchronousProductsRequest alloc] initWithProductIdentifiers:productIdentifiers];
+    LolaySynchronousProductsRequest* productsRequest = [[LolaySynchronousProductsRequest alloc] initWithProductIdentifiers:productIdentifiers];
     return [productsRequest productsResponseWithTimeout:timeout error:error];
 }
 
-- (id) initWithProductIdentifiers:(NSSet *)productIdentifiers {
+- (id) initWithProductIdentifiers:(NSSet*) productIdentifiers {
     self = [super init];
     if (self) {
         self.productsIdentifiers = productIdentifiers;
@@ -64,11 +64,11 @@ enum { HAS_PRODUCTS, NO_PRODUCTS };
     return theResponse;
 } 
 
-- (void)productsRequest:(SKProductsRequest *) request didReceiveResponse:(SKProductsResponse *) response {
+- (void)productsRequest:(SKProductsRequest*) request didReceiveResponse:(SKProductsResponse*) response {
     NSArray* responseProducts = response.products;
     DLog(@"Got products from AppStore %@", responseProducts);
     
-    for (NSString *invalidProductId in response.invalidProductIdentifiers) {
+    for (NSString* invalidProductId in response.invalidProductIdentifiers) {
         NSLog(@"Invalid product id: %@" , invalidProductId);
     }
     

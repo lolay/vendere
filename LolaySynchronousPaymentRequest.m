@@ -38,7 +38,7 @@ enum {
 /*
  * Returns array of LolaySKPaymentTransaction.  If array is empty then the transaction has failed.
  */
-- (NSArray *)makePaymentForProduct:(NSString*)productIdentifier error:(NSError **)error {
+- (NSArray*) makePaymentForProduct:(NSString*)productIdentifier error:(NSError**) error {
     SKPayment* payment = [SKPayment paymentWithProductIdentifier:productIdentifier];
     [[SKPaymentQueue defaultQueue] addPayment:payment];
     
@@ -57,7 +57,7 @@ enum {
 
 #pragma mark - SKPaymentTransactionObserver
 
-- (void) failedTransaction: (SKPaymentTransaction *)transaction {
+- (void) failedTransaction: (SKPaymentTransaction*) transaction {
     if (transaction.error.code != SKErrorPaymentCancelled) {
         //TODO what to do with failed transaction??? For now just log it.
         DLog(@"Got a failed transaction: %@", transaction);
@@ -67,7 +67,7 @@ enum {
 }
 
 - (void) recordTransaction:(SKPaymentTransaction*) transaction {
-    LolaySKPaymentTransaction * lvdTransaction = [LolaySKPaymentTransaction transactionWithIdentifier:transaction.transactionIdentifier receipt:transaction.transactionReceipt transactionDate:transaction.transactionDate];
+    LolaySKPaymentTransaction* lvdTransaction = [LolaySKPaymentTransaction transactionWithIdentifier:transaction.transactionIdentifier receipt:transaction.transactionReceipt transactionDate:transaction.transactionDate];
     [self.transactions addObject:lvdTransaction];
 }
 

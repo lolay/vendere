@@ -9,6 +9,6 @@
 @interface LolaySynchronousProductsRequest : NSObject <SKProductsRequestDelegate>
 
 + (SKProductsResponse*) productsResponseForProductIdentifiers:(NSSet*) productIdentifiers timeout:(NSTimeInterval) timeout error:(NSError**) error;
-- (id) initWithProductIdentifiers:(NSSet *)productIdentifiers;
+- (id) initWithProductIdentifiers:(NSSet*) productIdentifiers;
 - (SKProductsResponse*) productsResponseWithTimeout:(NSInteger) timeout error:(NSError**) error;
 @end

@@ -13,6 +13,6 @@
 /**
  *  Returns array of LolaySKPaymentTransaction
  */
-- (NSArray *)makePaymentForProduct:(NSString *)productIdentifier error:(NSError **)error;
+- (NSArray*) makePaymentForProduct:(NSString*) productIdentifier error:(NSError**) error;
 
 @end

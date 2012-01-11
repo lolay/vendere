@@ -13,6 +13,6 @@
 @property (nonatomic, strong) NSString* identifier;
 @property (nonatomic, strong) NSData* receipt;
 
-+ (LolaySKPaymentTransaction *) transactionWithIdentifier:(NSString*) identifier receipt:(NSData*) receipt transactionDate:(NSDate*) transactionDate;
++ (LolaySKPaymentTransaction*) transactionWithIdentifier:(NSString*) identifier receipt:(NSData*) receipt transactionDate:(NSDate*) transactionDate;
 
 @end
