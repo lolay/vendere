@@ -1,6 +1,6 @@
 //
 //  Created by Lolay, Inc.
-//  Copyright 2011 MyLife, Inc. All rights reserved.
+//  Copyright 2012 Lolay, Inc. All rights reserved.
 //
 
 #import <Foundation/Foundation.h>

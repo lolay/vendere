@@ -1,9 +1,11 @@
 //
 //  Created by Lolay, Inc.
-//  Copyright 2011 MyLife, Inc. All rights reserved.
+//  Copyright 2012 Lolay, Inc. All rights reserved.
 //
 
 #import "LolaySynchronousProductsRequest.h"
+#import "LolayVendere.h"
+
 #define LDSSynchronousProductsRequestDefaultTimeout 20000;
 
 @interface LolaySynchronousProductsRequest ()
@@ -11,8 +13,6 @@
 @property (nonatomic, strong) SKProductsResponse* response;
 @property (nonatomic, strong) NSConditionLock* lock;
 @end
-
-#define LVDProductsRequestTimedOut 0
 
 @implementation LolaySynchronousProductsRequest
 
