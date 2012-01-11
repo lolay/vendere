@@ -52,8 +52,7 @@ enum { HAS_PRODUCTS, NO_PRODUCTS };
         theResponse = self.response;
         self.response = nil;
         [self.lock unlockWithCondition:NO_PRODUCTS];
-    }
-    else {
+    } else {
         // timed out
         productsRequest.delegate = nil;
         NSError* newError = [NSError errorWithDomain:@"LVD" code:LVDProductsRequestTimedOut userInfo:nil];
