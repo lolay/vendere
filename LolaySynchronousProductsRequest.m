@@ -69,7 +69,7 @@ enum { HAS_PRODUCTS, NO_PRODUCTS };
     DLog(@"Got products from AppStore %@", responseProducts);
     
     for (NSString* invalidProductId in response.invalidProductIdentifiers) {
-        NSLog(@"Invalid product id: %@" , invalidProductId);
+        DLog(@"Invalid product id: %@" , invalidProductId);
     }
     
     [self.lock lock];
