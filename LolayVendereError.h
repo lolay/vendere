@@ -1,5 +1,5 @@
 //
-//  Copyright 2012 Lolay, Inc.
+//  Copyright 2012, 2013 Lolay, Inc.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -13,13 +13,11 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 //
+typedef enum {
+	LolayVendereErrorTimeout = 2000,
+	LolayVendereErrorWaiting = 2001,
+	LolayVendereErrorCantMakePayments = 2002,
+	LolayVendereErrorInvalidProductIdentifier = 2003 // Only used for make a payment
+} LolayVendereError;
 
-#import <Foundation/Foundation.h>
-#import <StoreKit/StoreKit.h>
-
-@interface LolaySynchronousProductsRequest : NSObject <SKProductsRequestDelegate>
-
-+ (SKProductsResponse*) productsResponseForProductIdentifiers:(NSSet*) productIdentifiers timeout:(NSTimeInterval) timeout error:(NSError**) error;
-- (id) initWithProductIdentifiers:(NSSet*) productIdentifiers;
-- (SKProductsResponse*) productsResponseWithTimeout:(NSInteger) timeout error:(NSError**) error;
-@end
+#define LolayVendereErrorDomain @"LVD"

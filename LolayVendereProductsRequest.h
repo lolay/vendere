@@ -1,5 +1,5 @@
 //
-//  Copyright 2012 Lolay, Inc.
+//  Copyright 2012, 2013 Lolay, Inc.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -13,17 +13,17 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 //
-
 #import <Foundation/Foundation.h>
 
-/*
- * This captures data from SKPaymentTransaction in an archivable form
- */
-@interface LolaySKPaymentTransaction : NSObject
-@property (nonatomic, strong) NSDate* transactionDate;
-@property (nonatomic, strong) NSString* identifier;
-@property (nonatomic, strong) NSData* receipt;
+@class SKProductsResponse;
 
-+ (LolaySKPaymentTransaction*) transactionWithIdentifier:(NSString*) identifier receipt:(NSData*) receipt transactionDate:(NSDate*) transactionDate;
+@interface LolayVendereProductsRequest : NSObject
+
+- (id) initWithProductIdentifiers:(NSSet*) productIdentifiers;
+
+- (SKProductsResponse*) productsResponseError:(NSError**) error;
++ (SKProductsResponse*) productsResponseForProductIdentifiers:(NSSet*) productIdentifiers error:(NSError**) error;
+- (SKProductsResponse*) productsResponseWithTimeout:(NSInteger) timeout error:(NSError**) error;
++ (SKProductsResponse*) productsResponseForProductIdentifiers:(NSSet*) productIdentifiers timeout:(NSTimeInterval) timeout error:(NSError**) error;
 
 @end
