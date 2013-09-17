@@ -19,7 +19,7 @@
 #import "LolayVendereError.h"
 #import "LolayVendereProductsRequest.h"
 
-#define LolayVenderePaymentRequestDefaultTimeout 20000
+#define LolayVenderePaymentRequestDefaultTimeout 20
 
 @interface LolayVenderePaymentRequest () <SKPaymentTransactionObserver>
 

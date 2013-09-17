@@ -18,7 +18,7 @@
 #import <StoreKit/StoreKit.h>
 #import "LolayVendereError.h"
 
-#define LolayVendereProductsRequestDefaultTimeout 20000
+#define LolayVendereProductsRequestDefaultTimeout 20
 
 @interface LolayVendereProductsRequest () <SKProductsRequestDelegate>
 

@@ -18,7 +18,7 @@
 #import <StoreKit/StoreKit.h>
 #import "LolayVendereError.h"
 
-#define LolayVendereRestoreRequestDefaultTimeout 20000
+#define LolayVendereRestoreRequestDefaultTimeout 20
 
 @interface LolayVendereRestoreRequest () <SKPaymentTransactionObserver>
 
