@@ -14,23 +14,21 @@
 //  limitations under the License.
 //
 
-#import "LolayVenderePaymentRequest.h"
+#import "LolayVendereRestoreRequest.h"
 #import <StoreKit/StoreKit.h>
 #import "LolayVendereError.h"
-#import "LolayVendereProductsRequest.h"
 
-#define LolayVenderePaymentRequestDefaultTimeout 20000
+#define LolayVendereRestoreRequestDefaultTimeout 20000
 
-@interface LolayVenderePaymentRequest () <SKPaymentTransactionObserver>
+@interface LolayVendereRestoreRequest () <SKPaymentTransactionObserver>
 
-@property (nonatomic, strong) NSString* productIdentifier;
 @property (nonatomic, strong) NSSet* transactions;
 @property (nonatomic, strong) NSConditionLock* lock;
 @property (nonatomic, retain) NSError* error;
 
 @end
 
-@implementation LolayVenderePaymentRequest
+@implementation LolayVendereRestoreRequest
 
 enum {
 	WAITING = 1,
@@ -44,6 +42,7 @@ enum {
 	
     if (self) {
         _lock = [[NSConditionLock alloc] initWithCondition:WAITING];
+		_lock.name = @"LolayVendereRestoreRequestLock";
     }
 	
     return self;
@@ -53,24 +52,13 @@ enum {
 
 - (void) reset {
 	[[SKPaymentQueue defaultQueue] removeTransactionObserver:self];
-	self.productIdentifier = nil;
 	self.transactions = nil;
 	self.error = nil;
 	self.lock = [[NSConditionLock alloc] initWithCondition:WAITING];
+	self.lock.name = @"LolayVendereRestoreRequestLock";
 }
 
-/*
- * Returns array of LolaySKPaymentTransaction.  If array is empty then the transaction has failed.
- */
-- (NSSet*) makePaymentForProduct:(NSString*) productIdentifier timeout:(NSTimeInterval) timeout error:(NSError**) error {
-	if (! [SKPaymentQueue canMakePayments]) {
-        if (error != NULL) {
-			*error = [NSError errorWithDomain:LolayVendereErrorDomain code:LolayVendereErrorCantMakePayments userInfo:nil];
-		}
-		[self reset];
-        return nil;
-	}
-	
+- (NSSet*) restorePaymentsWithTimeout:(NSTimeInterval) timeout error:(NSError**) error {
 	if (self.lock.condition != WAITING) {
         if (error != NULL) {
 			*error = [NSError errorWithDomain:LolayVendereErrorDomain code:LolayVendereErrorWaiting userInfo:nil];
@@ -80,45 +68,17 @@ enum {
 	}
 	
     if (timeout <= 0) {
-        timeout = LolayVenderePaymentRequestDefaultTimeout;
+        timeout = LolayVendereRestoreRequestDefaultTimeout;
     }
     NSDate* expiration = [[NSDate alloc] initWithTimeIntervalSinceNow:timeout];
 	
-	NSError* productsError = nil;
-	self.productIdentifier = productIdentifier;
-	SKProductsResponse* productsResponse = [LolayVendereProductsRequest productsResponseForProductIdentifiers:[[NSSet alloc] initWithObjects:productIdentifier, nil] timeout:timeout error:&productsError];
-	if (productsError) {
-		if (error != NULL) {
-			*error = productsError;
-		}
-		return nil;
-	}
-	
-	SKProduct* product = nil;
-	for (SKProduct* oneProduct in productsResponse.products) {
-		if ([oneProduct.productIdentifier isEqualToString:productIdentifier]) {
-			product = oneProduct;
-			break;
-		}
-	}
-	
-	if (product == nil) {
-		if (error != NULL) {
-			*error = [NSError errorWithDomain:LolayVendereErrorDomain code:LolayVendereErrorInvalidProductIdentifier userInfo:nil];
-		}
-		return nil;
-	}
-	
-    SKPayment* payment = [SKPayment paymentWithProduct:product];
 	[[SKPaymentQueue defaultQueue] addTransactionObserver:self];
-    [[SKPaymentQueue defaultQueue] addPayment:payment];
-    
-	// Trigger a latch for when the asynchronous tasks are completed
-    BOOL locked = [self.lock lockWhenCondition:COMPLETED beforeDate:expiration];
-	[self.lock unlock];
+	[[SKPaymentQueue defaultQueue] restoreCompletedTransactions];
+	
+	BOOL locked = [self.lock lockWhenCondition:COMPLETED beforeDate:expiration];
 	
 	NSSet* transactions = nil;
-
+	
 	if (locked) {
 		if (self.error) {
 			if (error != NULL) {
@@ -134,22 +94,24 @@ enum {
 			*error = [NSError errorWithDomain:LolayVendereErrorDomain code:LolayVendereErrorTimeout userInfo:nil];
 		}
 	}
-
+	
+	[self.lock unlockWithCondition:WAITING];
 	[self reset];
 	return transactions;
 }
 
-+ (NSSet*) makePaymentForProduct:(NSString*) productIdentifier timeout:(NSTimeInterval) timeout error:(NSError**) error {
-	return [[[LolayVenderePaymentRequest alloc] init] makePaymentForProduct:productIdentifier timeout:timeout error:error];
++ (NSSet*) restorePaymentsWithTimeout:(NSTimeInterval) timeout error:(NSError**) error {
+	return [[[LolayVendereRestoreRequest alloc] init] restorePaymentsWithTimeout:timeout error:error];
 }
 
-- (NSSet*) makePaymentForProduct:(NSString*) productIdentifier error:(NSError**) error {
-	return [self makePaymentForProduct:productIdentifier timeout:LolayVenderePaymentRequestDefaultTimeout error:error];
+- (NSSet*) restorePaymentsWithError:(NSError**) error {
+	return [self restorePaymentsWithTimeout:LolayVendereRestoreRequestDefaultTimeout error:error];
 }
 
-+ (NSSet*) makePaymentForProduct:(NSString*) productIdentifier error:(NSError**) error {
-	return [LolayVenderePaymentRequest makePaymentForProduct:productIdentifier timeout:LolayVenderePaymentRequestDefaultTimeout error:error];
++ (NSSet*) restorePaymentsWithError:(NSError**) error {
+	return [LolayVendereRestoreRequest restorePaymentsWithTimeout:LolayVendereRestoreRequestDefaultTimeout error:error];
 }
+
 
 #pragma mark - SKPaymentTransactionObserver
 
@@ -180,11 +142,7 @@ enum {
 }
 
 - (void) paymentQueue:(SKPaymentQueue*) queue updatedTransactions:(NSArray*) transactions {
-	BOOL completed = NO;
     for (SKPaymentTransaction* transaction in transactions) {
-		if ([transaction.payment.productIdentifier isEqualToString:self.productIdentifier]) {
-			completed = YES;
-		}
         switch (transaction.transactionState) {
             case SKPaymentTransactionStatePurchased:
                 [self purchasedTransaction:transaction];
@@ -197,9 +155,18 @@ enum {
                 break;
         }
     }
-	
-	if (completed && self.lock.condition != COMPLETED) {
-		// Trigger the latch
+}
+
+- (void) paymentQueueRestoreCompletedTransactionsFinished:(SKPaymentQueue*) queue {
+	if (self.lock.condition != COMPLETED) {
+		[self.lock lock];
+		[self.lock unlockWithCondition:COMPLETED];
+	}
+}
+
+- (void) paymentQueue:(SKPaymentQueue*) queue restoreCompletedTransactionsFailedWithError:(NSError*) error {
+	self.error = error;
+	if (self.lock.condition != COMPLETED) {
 		[self.lock lock];
 		[self.lock unlockWithCondition:COMPLETED];
 	}

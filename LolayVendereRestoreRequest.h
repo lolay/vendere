@@ -16,16 +16,16 @@
 
 #import <Foundation/Foundation.h>
 
-@interface LolayVenderePaymentRequest : NSObject
+@interface LolayVendereRestoreRequest : NSObject
 
 - (id) init;
 
 /**
  *  Returns array of SKPaymentTransaction. When making a payment, it can be likely to get more than the original purchase back.
  */
-- (NSSet*) makePaymentForProduct:(NSString*) productIdentifier error:(NSError**) error;
-+ (NSSet*) makePaymentForProduct:(NSString*) productIdentifier error:(NSError**) error;
-- (NSSet*) makePaymentForProduct:(NSString*) productIdentifier timeout:(NSTimeInterval) timeout error:(NSError**) error;
-+ (NSSet*) makePaymentForProduct:(NSString*) productIdentifier timeout:(NSTimeInterval) timeout error:(NSError**) error;
+- (NSSet*) restorePaymentsWithError:(NSError**) error;
++ (NSSet*) restorePaymentsWithError:(NSError**) error;
+- (NSSet*) restorePaymentsWithTimeout:(NSTimeInterval) timeout error:(NSError**) error;
++ (NSSet*) restorePaymentsWithTimeout:(NSTimeInterval) timeout error:(NSError**) error;
 
 @end

@@ -43,6 +43,7 @@ enum {
     if (self) {
         _productsIdentifiers = productIdentifiers;
         _lock = [[NSConditionLock alloc] initWithCondition:WAITING];
+		_lock.name = @"LolayVendereProductsRequestLock";
     }
 	
     return self;
@@ -54,6 +55,7 @@ enum {
 	self.response = nil;
 	self.productsIdentifiers = nil;
 	self.lock = [[NSConditionLock alloc] initWithCondition:WAITING];
+	self.lock.name = @"LolayVendereProductsRequestLock";
 }
 
 - (SKProductsResponse*) productsResponseWithTimeout:(NSInteger) timeout error:(NSError**) error {
@@ -75,8 +77,11 @@ enum {
     [productsRequest start];
 	
 	SKProductsResponse* response = nil;
-	
+
+	// FIXME: Is there a better way than using a lock?
+	// Create a latch waiting for when completed
     BOOL locked = [self.lock lockWhenCondition:COMPLETED beforeDate:expiration];
+	[self.lock unlock];
 	
     if (locked) {
 		response = self.response;
@@ -90,7 +95,6 @@ enum {
 		response = nil; // Just in case
     }
 
-	[self.lock unlockWithCondition:WAITING];
 	[self reset];
 	return response;
 }
@@ -110,7 +114,6 @@ enum {
 #pragma mark - SKProductsRequestDelegate
 
 - (void) productsRequest:(SKProductsRequest*) request didReceiveResponse:(SKProductsResponse*) response {
-	[self.lock lock];
     NSArray* responseProducts = response.products;
     DLog(@"Got products from AppStore %@", responseProducts);
     
@@ -121,7 +124,12 @@ enum {
     
     self.response = response;
 	request.delegate = nil; // Just in case
-	[self.lock unlockWithCondition:COMPLETED];
+	
+	// Trigger an unlatch
+	if (self.lock.condition != COMPLETED) {
+		[self.lock lock];
+		[self.lock unlockWithCondition:COMPLETED];
+	}
 }
 
 @end
