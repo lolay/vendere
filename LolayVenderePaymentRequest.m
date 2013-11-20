@@ -182,7 +182,7 @@ enum {
 - (void) paymentQueue:(SKPaymentQueue*) queue updatedTransactions:(NSArray*) transactions {
 	BOOL completed = NO;
     for (SKPaymentTransaction* transaction in transactions) {
-		DLog(@"productIdentifier=%@, transactionState=%i", transaction.payment.productIdentifier ,transaction.transactionState);
+		DLog(@"productIdentifier=%@, transactionState=%ld", transaction.payment.productIdentifier , (long)transaction.transactionState);
 		if ([transaction.payment.productIdentifier isEqualToString:self.productIdentifier] && transaction.transactionState != SKPaymentTransactionStatePurchasing) {
 			completed = YES;
 		}
